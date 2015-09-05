@@ -28,16 +28,16 @@ import javax.swing.event.DocumentListener;
 public class Editor {
 
 	private List<Clan> clans;
-	private List<Character> characters;
+	private List<Officer> characters;
 	
 	private List<Clan> clansSorted;
-	private List<Character> charactersSorted;
+	private List<Officer> charactersSorted;
 
 	private Map<Integer, Integer> clanIndex2clanSortedIndex;
 
 	final JLabel labelOVR = new JLabel();
 	
-	private Character character;
+	private Officer character;
 	
 	private final static Dimension DIMENSIONS = new Dimension(1000, 800);
 	private final static Dimension DIMENSION_DROPDOWN = new Dimension(80, 25);
@@ -45,14 +45,16 @@ public class Editor {
 	private final static Dimension DIMENSION_FIELD_MED = new Dimension(60, 25);
 	private final static Dimension DIMENSION_FIELD_LARGE = new Dimension(140, 25);
 	
-	public Editor (List<Clan> clans, List<Character> characters) {	
+	public Editor (List<Clan> clans, List<Officer> characters) {	
 		
 		this.clans = clans;
 		this.characters = characters;
 		this.clansSorted = new ArrayList<>(clans);
 		Collections.sort(clansSorted, Clan.NameComparator());
 		this.charactersSorted = new ArrayList<>(characters);
-		Collections.sort(charactersSorted, Character.NameComparator());
+		
+		
+		Collections.sort(charactersSorted, Officer.NameComparator());
 		
 		clanIndex2clanSortedIndex = new HashMap<>();
 		
@@ -247,13 +249,34 @@ public class Editor {
 			final JTextField fieldName = new JTextField();
 			fieldName.setMaximumSize(DIMENSION_FIELD_LARGE);
 			fieldName.setMaximumSize(DIMENSION_FIELD_LARGE);
+			fieldName.getDocument().addDocumentListener(new DocumentListener(){
+				public void changedUpdate(DocumentEvent arg0) { update(); }
+				public void insertUpdate(DocumentEvent arg0) { update(); }
+				public void removeUpdate(DocumentEvent arg0) { update(); }
+				public void update () {
+					String name2 = fieldName.getText();
+					for (int i = 0; i < name2.length(); i++) {
+						char c = name2.charAt(i);
+						if (!Character.isLetter(c) && c != ' ')
+							return;
+					}
+					character.name = name2;
+				}
+			});
 
 			final JLabel labelClan = new JLabel("Clan ");
 			final JComboBox<Clan> dropdownClan = new JComboBox(clansSorted.toArray());
 			dropdownClan.setPreferredSize(DIMENSION_DROPDOWN);
 			dropdownClan.setMaximumSize(DIMENSION_DROPDOWN);
-			
-			
+			dropdownClan.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					Clan clan = (Clan) dropdownClan.getSelectedItem();
+					character.stats.clan = clan;
+				}
+				
+			});
 			
 			final JLabel labelWAR = new JLabel("WAR ");
 			final JTextField fieldWAR = new JTextField();
@@ -345,15 +368,17 @@ public class Editor {
 			horizontalInfo.addGroup(layoutInfo.createParallelGroup()
 				.addComponent(fieldName).addComponent(dropdownClan));
 			
-			// Character select.
+			// Character select, new character.
 			final JComboBox dropdown = new JComboBox(charactersSorted.toArray());
 			dropdown.setPreferredSize(new Dimension(80, 25));
 			dropdown.setMaximumSize(new Dimension(80, 25));
-			
 			dropdown.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent event) {
-					character = (Character)dropdown.getSelectedItem();
+					
+					if (dropdown.getItemCount() == 0) return;
+					
+					character = (Officer)dropdown.getSelectedItem();
 					fieldName.setText(character.toString());
 					Stats stats = character.stats;
 					fieldWAR.setText(""+stats.WAR);
@@ -369,8 +394,70 @@ public class Editor {
 				}
 			});
 			dropdown.setSelectedIndex(0);
-		
-			// Layout for everything.	
+			
+			final JButton buttonNewChar = new JButton("+");
+			buttonNewChar.setMaximumSize(new Dimension(20, 20));
+			buttonNewChar.setPreferredSize(new Dimension(20, 20));
+			buttonNewChar.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					Stats stats = new Stats();
+					Officer newchar = new Officer("", stats);
+					characters.add(newchar);
+					charactersSorted.add(newchar);
+					Collections.sort(charactersSorted, Officer.NameComparator());
+
+					dropdown.removeAllItems();
+					for (Officer c : charactersSorted) {
+						dropdown.addItem(c);
+					}
+					
+					for (int i = 0; i < charactersSorted.size(); i++) {
+						if (charactersSorted.get(i) == character) {
+							dropdown.setSelectedIndex(i);
+							return;
+						}
+					}
+				}
+				
+			});
+			
+			final JButton buttonDelChar = new JButton("Delete");
+			buttonDelChar.setMaximumSize(new Dimension(20, 20));
+			buttonDelChar.setPreferredSize(new Dimension(20, 20));
+			buttonDelChar.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (characters.size() == 1) return;
+					characters.remove(character);
+					charactersSorted.remove(character);
+					dropdown.removeItem(character);
+					dropdown.setSelectedIndex(0);
+				}
+			});
+			
+			JPanel panelTop = new JPanel();
+			GroupLayout layoutTop = new GroupLayout(panelTop);
+			layoutTop.setAutoCreateContainerGaps(true);
+			layoutTop.setAutoCreateGaps(true);
+			panelTop.setLayout(layoutTop);
+			GroupLayout.SequentialGroup horizontalTop = layoutTop.createSequentialGroup();
+			GroupLayout.SequentialGroup verticalTop = layoutTop.createSequentialGroup();
+			layoutTop.setHorizontalGroup(horizontalTop);
+			layoutTop.setVerticalGroup(verticalTop);
+			
+			verticalTop.addGroup(layoutTop.createParallelGroup()
+				.addComponent(dropdown).addComponent(buttonNewChar).addComponent(buttonDelChar));
+			horizontalTop.addComponent(dropdown);
+			horizontalTop.addComponent(buttonNewChar);
+			horizontalTop.addComponent(buttonDelChar);
+
+			
+			
+			
+			// Layout for everything.
 			GroupLayout layout = new GroupLayout(this);
 			layout.setAutoCreateContainerGaps(true);
 			this.setLayout(layout);
@@ -380,13 +467,13 @@ public class Editor {
 			layout.setHorizontalGroup(horizontal);
 			layout.setVerticalGroup(vertical);
 			
-			vertical.addComponent(dropdown);
+			vertical.addComponent(panelTop);
 			vertical.addComponent(panelInfo);
 			vertical.addComponent(panelStats);
 			vertical.addComponent(labelOVR);
 			
 			horizontal.addGroup(layout.createParallelGroup()
-				.addComponent(dropdown)
+				.addComponent(panelTop)
 				.addComponent(panelInfo)
 				.addComponent(panelStats)
 				.addComponent(labelOVR));
@@ -401,7 +488,7 @@ public class Editor {
 	
 	public static void main (String[] args) {
 		List<Clan> clans = null;
-		List<Character> chars = null;
+		List<Officer> chars = null;
 		try {
 			clans = Loader.LoadClans("data" + File.separatorChar + "clans.dat");
 			chars = Loader.LoadCharacters("data" + File.separatorChar + "characters.dat", clans);

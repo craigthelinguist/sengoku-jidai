@@ -1,7 +1,7 @@
 
 public class Daimyo {
 	
-	private Character leader;
+	private Officer leader;
 	
 	
 }

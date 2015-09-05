@@ -43,13 +43,13 @@ public class Loader {
 		}
 	}
 
-	public static List<Character> LoadCharacters(String fpath, List<Clan> clans)
+	public static List<Officer> LoadCharacters(String fpath, List<Clan> clans)
 			throws IOException {
 		File file = new File(fpath);
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader(file));
-			List<Character> chars = new ArrayList<>();
+			List<Officer> chars = new ArrayList<>();
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				
@@ -134,7 +134,7 @@ public class Loader {
 				stats.SPI = SPI;
 				stats.clan = clans.get(clanID);
 
-				Character character = new Character(name, stats);
+				Officer character = new Officer(name, stats);
 				chars.add(character);
 
 			}

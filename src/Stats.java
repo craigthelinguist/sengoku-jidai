@@ -9,6 +9,11 @@ public class Stats {
 	public int SPI;
 	public Clan clan;
 	
+	public Stats () {
+		WAR = CHR = INT = POL = CUL = SPI = 0;
+		clan = Clan.RONIN;
+	}
+	
 	public int overall () {
 		return (int) (Math.round(1.0*(WAR + CHR + INT + POL + CUL + SPI) / 6));
 	}

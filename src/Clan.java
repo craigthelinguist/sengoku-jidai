@@ -7,7 +7,8 @@ public class Clan {
 	private String name;
 	private BufferedImage emblem;
 	public final int ID;
-
+	public static final Clan RONIN = new Clan("Ronin", 0);
+	
 	public Clan (String name_, int ID) {
 		this.name = name_;
 		this.ID = ID;
