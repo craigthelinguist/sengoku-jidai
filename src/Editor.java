@@ -44,6 +44,7 @@ public class Editor {
 	private final static Dimension DIMENSION_FIELD_SMALL = new Dimension(30, 25);
 	private final static Dimension DIMENSION_FIELD_MED = new Dimension(60, 25);
 	private final static Dimension DIMENSION_FIELD_LARGE = new Dimension(140, 25);
+	private final static Dimension DIMENSION_BUTTON = new Dimension(20, 20);
 	
 	public Editor (List<Clan> clans, List<Officer> characters) {	
 		
@@ -126,8 +127,12 @@ public class Editor {
 		
 		public ClanView () {
 			setPreferredSize(DIMENSIONS);
-			
+
 			final JLabel labelClan = new JLabel();
+			
+			
+			
+
 			final JComboBox dropdown = new JComboBox(clansSorted.toArray());
 			dropdown.setPreferredSize(DIMENSION_DROPDOWN);
 			dropdown.setMaximumSize(DIMENSION_DROPDOWN);
@@ -140,6 +145,35 @@ public class Editor {
 				}
 			});
 			
+			final JButton buttonNewClan = new JButton("+");
+			buttonNewClan.setPreferredSize(DIMENSION_BUTTON);
+			buttonNewClan.setMaximumSize(DIMENSION_BUTTON);
+			
+			final JButton buttonDelClan = new JButton("Delete");
+			buttonDelClan.setPreferredSize(DIMENSION_BUTTON);
+			buttonDelClan.setMaximumSize(DIMENSION_BUTTON);
+			
+			
+			
+			JPanel panelTop = new JPanel();
+			GroupLayout layoutTop = new GroupLayout(panelTop);
+			layoutTop.setAutoCreateContainerGaps(true);
+			layoutTop.setAutoCreateGaps(true);
+			panelTop.setLayout(layoutTop);
+			
+			GroupLayout.SequentialGroup horizontalTop = layoutTop.createSequentialGroup();
+			GroupLayout.SequentialGroup verticalTop = layoutTop.createSequentialGroup();
+			layoutTop.setHorizontalGroup(horizontalTop);
+			layoutTop.setVerticalGroup(verticalTop);
+			
+			verticalTop.addGroup(layoutTop.createParallelGroup()
+				.addComponent(dropdown).addComponent(buttonNewClan).addComponent(buttonDelClan));
+			horizontalTop.addComponent(dropdown);
+			horizontalTop.addComponent(buttonNewClan);
+			horizontalTop.addComponent(buttonDelClan);
+			
+			
+			
 			GroupLayout layout = new GroupLayout(this);
 			layout.setAutoCreateGaps(true);
 			layout.setAutoCreateContainerGaps(true);
@@ -150,13 +184,13 @@ public class Editor {
 			layout.setHorizontalGroup(horizontal);
 			layout.setVerticalGroup(vertical);
 			
-			vertical.addComponent(dropdown);
+			vertical.addComponent(panelTop);
 			vertical.addComponent(labelClan);
 			
 			horizontal.addGroup(layout.createParallelGroup()
-				.addComponent(dropdown)
-				.addComponent(labelClan)
-			);
+				.addComponent(panelTop)
+				.addComponent(labelClan));
+			
 			
 		}
 		
@@ -396,8 +430,8 @@ public class Editor {
 			dropdown.setSelectedIndex(0);
 			
 			final JButton buttonNewChar = new JButton("+");
-			buttonNewChar.setMaximumSize(new Dimension(20, 20));
-			buttonNewChar.setPreferredSize(new Dimension(20, 20));
+			buttonNewChar.setMaximumSize(DIMENSION_BUTTON);
+			buttonNewChar.setPreferredSize(DIMENSION_BUTTON);
 			buttonNewChar.addActionListener(new ActionListener(){
 
 				@Override
@@ -424,8 +458,8 @@ public class Editor {
 			});
 			
 			final JButton buttonDelChar = new JButton("Delete");
-			buttonDelChar.setMaximumSize(new Dimension(20, 20));
-			buttonDelChar.setPreferredSize(new Dimension(20, 20));
+			buttonDelChar.setMaximumSize(DIMENSION_BUTTON);
+			buttonDelChar.setPreferredSize(DIMENSION_BUTTON);
 			buttonDelChar.addActionListener(new ActionListener(){
 
 				@Override
